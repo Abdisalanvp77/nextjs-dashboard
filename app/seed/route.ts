@@ -1,10 +1,11 @@
-import bcrypt from 'bcrypt';
-import postgres from 'postgres';
-import { invoices, customers, revenue, users } from '../lib/placeholder-data';
+import bcrypt from "bcrypt";
+import postgres from "postgres";
+import { invoices, customers, revenue, users } from "../lib/placeholder-data";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const sql = postgres(process.env.POSTGRES_URL_NON_POOLING!, { ssl: "require" });
 
 async function seedUsers() {
+  await sql`DROP TABLE users`;
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
   await sql`
     CREATE TABLE IF NOT EXISTS users (
@@ -30,6 +31,7 @@ async function seedUsers() {
 }
 
 async function seedInvoices() {
+  await sql`DROP TABLE invoices`;
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
   await sql`
@@ -56,6 +58,7 @@ async function seedInvoices() {
 }
 
 async function seedCustomers() {
+  await sql`DROP TABLE customers`;
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
   await sql`
@@ -81,6 +84,7 @@ async function seedCustomers() {
 }
 
 async function seedRevenue() {
+  await sql`DROP TABLE revenue`;
   await sql`
     CREATE TABLE IF NOT EXISTS revenue (
       month VARCHAR(4) NOT NULL UNIQUE,
@@ -110,7 +114,7 @@ export async function GET() {
       seedRevenue(),
     ]);
 
-    return Response.json({ message: 'Database seeded successfully' });
+    return Response.json({ message: "Database seeded successfully" });
   } catch (error) {
     return Response.json({ error }, { status: 500 });
   }
